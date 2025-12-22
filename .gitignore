@@ -47,3 +47,7 @@ build/
 # 기타
 Thumbs.dbgoogle-services-*.json
 **/google-services-*.json
+
+!static/play/**
+!static/play/Build/**
+!static/play/StreamingAssets/**

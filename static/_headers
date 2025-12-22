@@ -5,22 +5,22 @@
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Embedder-Policy: require-corp
 
-/*.unityweb
+/play/Build/*.data.unityweb
   Content-Type: application/octet-stream
   Content-Encoding: br
 
-/*.data.unityweb
-  Content-Type: application/octet-stream
-  Content-Encoding: br
-
-/*.framework.js.unityweb
-  Content-Type: application/javascript; charset=utf-8
-  Content-Encoding: br
-
-/*.js.unityweb
-  Content-Type: application/javascript; charset=utf-8
-  Content-Encoding: br
-
-/*.wasm.unityweb
+/play/Build/*.wasm.unityweb
   Content-Type: application/wasm
+  Content-Encoding: br
+
+/play/Build/*.framework.js.unityweb
+  Content-Type: application/javascript; charset=utf-8
+  Content-Encoding: br
+
+/play/Build/*.js.unityweb
+  Content-Type: application/javascript; charset=utf-8
+  Content-Encoding: br
+
+/play/Build/*.unityweb
+  Content-Type: application/octet-stream
   Content-Encoding: br

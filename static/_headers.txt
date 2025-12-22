@@ -1,0 +1,14 @@
+/play/Build/*.unityweb
+  Content-Encoding: gzip
+
+/play/Build/*.wasm.unityweb
+  Content-Type: application/wasm
+  Content-Encoding: gzip
+
+/play/Build/*.data.unityweb
+  Content-Type: application/octet-stream
+  Content-Encoding: gzip
+
+/play/Build/*.framework.js.unityweb
+  Content-Type: application/javascript
+  Content-Encoding: gzip

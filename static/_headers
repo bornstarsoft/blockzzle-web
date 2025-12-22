@@ -5,18 +5,22 @@
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Embedder-Policy: require-corp
 
-/*.wasm
-  Content-Type: application/wasm
-
 /*.unityweb
   Content-Type: application/octet-stream
   Content-Encoding: br
 
 /*.data.unityweb
   Content-Type: application/octet-stream
+  Content-Encoding: br
 
 /*.framework.js.unityweb
   Content-Type: application/javascript; charset=utf-8
+  Content-Encoding: br
 
 /*.js.unityweb
   Content-Type: application/javascript; charset=utf-8
+  Content-Encoding: br
+
+/*.wasm.unityweb
+  Content-Type: application/wasm
+  Content-Encoding: br

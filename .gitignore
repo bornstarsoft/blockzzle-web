@@ -1,0 +1,49 @@
+# macOS 시스템 파일
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Hugo 관련
+/public/
+/resources/
+.hugo_build.lock
+hugo_stats.json
+
+# 백업 파일
+*~
+*.swp
+*.bak
+*.tmp
+
+# 로그 및 캐시
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# IDE & 편집기
+.vscode/
+.idea/
+*.code-workspace
+
+# 환경 변수
+.env
+.env.*
+
+# Node modules (만약 사용 중이라면)
+node_modules/
+
+# Python (예: AI 관련 코드 같이 쓰는 경우)
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Git 자체 서브모듈 기록 (이미 제거했으면 무시)
+.gitmodules
+
+# 기타
+Thumbs.dbgoogle-services-*.json
+**/google-services-*.json

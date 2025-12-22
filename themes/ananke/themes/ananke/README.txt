@@ -1,0 +1,1 @@
+This is a placeholder for the Ananke theme. You should install it via git submodule or manually.

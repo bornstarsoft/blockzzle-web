@@ -1,0 +1,38 @@
+baseURL = "https://blockzzle.com/"
+languageCode = "en-us"
+title = "Blockzzle"
+
+enableRobotsTXT = true
+buildFuture = false
+
+# 불필요한 페이지 생성 끄기
+disableKinds = ["taxonomy", "term", "RSS"]
+
+[sitemap]
+changefreq = "daily"
+filename = "sitemap.xml"
+priority = 0.5
+
+[pagination]
+pagerSize = 10
+
+[params]
+  description = "Blockzzle WebGL demo. Play instantly in your browser."
+  google_analytics = ""
+
+  # 앱 설치 링크(버튼에 사용)
+  play_url = "https://play.google.com/store/apps/details?id=com.bornstarsoft.matchcolorblocks"
+  appstore_url = ""
+
+# [하단 필수 메뉴]
+[[params.footer_menu]]
+  name = "Privacy"
+  url = "/privacy/"
+
+[[params.footer_menu]]
+  name = "Terms"
+  url = "/terms/"
+
+[[params.footer_menu]]
+  name = "Contact"
+  url = "/contact/"

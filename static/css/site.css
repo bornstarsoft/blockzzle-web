@@ -1,0 +1,122 @@
+:root {
+    --bg1: #0b1220;
+    --bg2: #0a1b2e;
+    --card: rgba(255, 255, 255, .06);
+    --border: rgba(255, 255, 255, .10);
+    --text: #eaf0ff;
+    --muted: rgba(234, 240, 255, .70);
+    --accent: #41c6ff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    color: var(--text);
+    background: radial-gradient(1200px 600px at 20% 10%, #18294a 0%, transparent 60%),
+        radial-gradient(1200px 600px at 90% 20%, #3a1d6b 0%, transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+}
+
+.site {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 28px 20px 40px;
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--text);
+}
+
+.brand .dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: inline-block;
+}
+
+.brand .name {
+    font-weight: 800;
+    font-size: 28px;
+    letter-spacing: -.02em;
+}
+
+.topnav a {
+    color: var(--muted);
+    text-decoration: none;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+}
+
+.topnav a:hover {
+    color: var(--text);
+    border-color: var(--border);
+    background: rgba(255, 255, 255, .04);
+}
+
+.main {
+    margin-top: 22px;
+}
+
+.page {
+    padding: 26px;
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    background: var(--card);
+    backdrop-filter: blur(10px);
+}
+
+.page-title {
+    margin: 0 0 14px;
+    font-size: 34px;
+    letter-spacing: -.02em;
+}
+
+.page-content {
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+.page-content a {
+    color: var(--text);
+}
+
+.footer {
+    margin-top: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    color: var(--muted);
+}
+
+.footer-links {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.footer-links a {
+    color: var(--muted);
+    text-decoration: none;
+}
+
+.footer-links a:hover {
+    color: var(--text);
+}

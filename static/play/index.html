@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Unity Web Player | Blockzzle</title>
+
+  <!-- ✅ Overlay CSS -->
+  <style>
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      text-align: center;
+      padding: 0;
+      border: 0;
+      margin: 0;
+      background: #0b1220;
+    }
+
+    /* Top overlay */
+    #bssOverlay {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      z-index: 9999;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      pointer-events: none;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+
+    #bssOverlay * {
+      pointer-events: auto;
+    }
+
+    .bss-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bss-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .bss-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #41c6ff;
+      display: inline-block;
+    }
+
+    .bss-title {
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: -0.02em;
+      opacity: 0.95;
+    }
+
+    .bss-btn,
+    .bss-link {
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(0, 0, 0, 0.22);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      user-select: none;
+    }
+
+    .bss-link {
+      color: rgba(255, 255, 255, 0.85);
+      font-weight: 600;
+    }
+
+    .bss-btn:hover,
+    .bss-link:hover {
+      border-color: rgba(255, 255, 255, 0.22);
+    }
+
+    .bss-primary {
+      background: linear-gradient(135deg, #41c6ff, #2dd4bf);
+      border-color: transparent;
+      color: #06121f;
+    }
+
+    @media (max-width: 520px) {
+      .bss-title {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ✅ Top overlay UI -->
+  <div id="bssOverlay">
+    <div class="bss-left">
+      <a class="bss-brand" href="/">
+        <span class="bss-dot"></span>
+        <span class="bss-title">Blockzzle</span>
+      </a>
+      <a class="bss-link" href="/">Home</a>
+    </div>
+
+    <div class="bss-right" style="display: flex; gap: 10px; align-items: center;">
+      <button id="bssFullscreen" class="bss-btn" type="button">Fullscreen</button>
+      <a id="bssGetApp" class="bss-btn bss-primary" href="#" target="_blank" rel="noopener">Get the App</a>
+    </div>
+  </div>
+
+  <!-- ✅ Unity canvas -->
+  <canvas id="unity-canvas" width="540" height="960" tabindex="-1"
+    style="width: 540px; height: 960px; background: #231f20;"></canvas>
+
+  <script src="Build/Blockzzle_v5_web.loader.js"></script>
+  <script>
+    // ✅ Store URL
+    const STORE_URL =
+      "https://play.google.com/store/apps/details?id=com.bornstarsoft.matchcolorblocks";
+
+    function withUtm(url, content) {
+      try {
+        const u = new URL(url);
+        u.searchParams.set("utm_source", "webgl");
+        u.searchParams.set("utm_medium", "cta");
+        u.searchParams.set("utm_campaign", "blockzzle_web");
+        if (content) u.searchParams.set("utm_content", content);
+        return u.toString();
+      } catch (e) {
+        return url;
+      }
+    }
+
+    const getApp = document.getElementById("bssGetApp");
+    if (getApp) getApp.href = withUtm(STORE_URL, "play_overlay_top");
+
+    // ✅ 모바일 판별 (간단 UA)
+    const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    // ✅ Fullscreen 버튼: 모바일에서만 보이게 (PC에서는 숨김)
+    const fsBtn = document.getElementById("bssFullscreen");
+    if (fsBtn) {
+      if (!IS_MOBILE) {
+        fsBtn.style.display = "none";
+      } else {
+        fsBtn.addEventListener("click", async () => {
+          try {
+            // ✅ Unity SetFullscreen(1) 절대 호출하지 않음 (가로로 깨지는 주범)
+            // ✅ 브라우저 fullscreen만 시도 (모바일은 지원/제약이 기기마다 다름)
+            const el = document.getElementById("unity-canvas") || document.body;
+            if (el.requestFullscreen) await el.requestFullscreen();
+            else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+          } catch (e) {
+            console.warn(e);
+          }
+        });
+      }
+    }
+
+    // ✅ Mobile UA일 때 canvas full
+    if (IS_MOBILE) {
+      var meta = document.createElement("meta");
+      meta.name = "viewport";
+      meta.content =
+        "width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes";
+      document.getElementsByTagName("head")[0].appendChild(meta);
+
+      var canvas = document.querySelector("#unity-canvas");
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
+      canvas.style.position = "fixed";
+      canvas.style.left = "0";
+      canvas.style.top = "0";
+
+      document.body.style.textAlign = "left";
+    }
+
+    // ✅ Unity boot
+    createUnityInstance(document.querySelector("#unity-canvas"), {
+      arguments: [],
+      dataUrl: "Build/Blockzzle_v5_web.data.unityweb",
+      frameworkUrl: "Build/Blockzzle_v5_web.framework.js.unityweb",
+      codeUrl: "Build/Blockzzle_v5_web.wasm.unityweb",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "BORNSTAR SOFT",
+      productName: "Blockzzle",
+      productVersion: "5.0.1",
+    })
+      .then((unityInstance) => {
+        window.unityInstance = unityInstance;
+      })
+      .catch((message) => {
+        alert(message);
+      });
+  </script>
+</body>
+
+</html>

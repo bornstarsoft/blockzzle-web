@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{{ site.Title }}</title>
+  <meta name="description" content="{{ with site.Params.description }}{{ . }}{{ end }}">
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #111b2e;
+      --text: #e9eefc;
+      --sub: #a9b6d3;
+      --border: rgba(255, 255, 255, .10);
+      --shadow: 0 24px 60px rgba(0, 0, 0, .45);
+      --radius: 20px;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color: var(--text);
+      background:
+        radial-gradient(900px 600px at 15% 10%, rgba(110, 231, 183, .15), transparent 60%),
+        radial-gradient(900px 600px at 85% 20%, rgba(99, 102, 241, .18), transparent 60%),
+        radial-gradient(1200px 800px at 50% 110%, rgba(236, 72, 153, .12), transparent 60%),
+        var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+    }
+
+    .wrap {
+      width: min(980px, 100%);
+    }
+
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      letter-spacing: .2px;
+      font-size: 22px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #60a5fa, #34d399);
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .03));
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .hero {
+      padding: 34px 28px;
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 22px;
+    }
+
+    @media (max-width: 820px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    h1 {
+      margin: 0 0 10px 0;
+      font-size: 44px;
+      line-height: 1.05;
+    }
+
+    p {
+      margin: 0;
+      color: var(--sub);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 700;
+      background: rgba(255, 255, 255, .04);
+      transition: transform .12s ease, background .12s ease;
+      min-width: 170px;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, .07);
+    }
+
+    .btn.primary {
+      border: none;
+      background: linear-gradient(135deg, #60a5fa, #34d399);
+      color: #071018;
+    }
+
+    .panel {
+      background: rgba(0, 0, 0, .20);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    /* ✅ 추가: 패널 안 프리뷰 이미지 */
+    .preview {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      /* ✅ 가로 이미지 비율로 */
+      object-fit: contain;
+      /* ✅ 안 잘리고 전부 보이게 */
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, .10);
+      background: rgba(255, 255, 255, .04);
+      display: block;
+      margin-bottom: 14px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, .35);
+    }
+
+    .panel h3 {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+    }
+
+    .kvs {
+      display: grid;
+      gap: 10px;
+    }
+
+    .kv {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid rgba(255, 255, 255, .08);
+      font-size: 14px;
+    }
+
+    .kv span {
+      color: var(--sub)
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 18px;
+      border-top: 1px solid var(--border);
+      background: rgba(0, 0, 0, .12);
+      color: var(--sub);
+      font-size: 13px;
+    }
+
+    .links a {
+      color: var(--sub);
+      text-decoration: none;
+      margin-right: 12px;
+    }
+
+    .links a:hover {
+      color: var(--text)
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand"><span class="dot"></span>Blockzzle</div>
+      <div style="color:rgba(233,238,252,.7); font-size:13px;">WebGL Demo</div>
+    </div>
+
+    <div class="card">
+      <div class="hero">
+        <div>
+          <h1>Play Blockzzle<br />in your browser</h1>
+          <p>
+            Try the WebGL demo instantly. Reward ads and purchases are available in the mobile app.
+          </p>
+
+          <div class="actions">
+            <a class="btn primary" href="/play/">▶ Play Now</a>
+            <a class="btn" href="{{ site.Params.play_url }}" target="_blank" rel="noopener">Get the App</a>
+          </div>
+
+          <p style="margin-top:14px; font-size:13px;">
+            Tip: Best experience on Chrome / Edge (desktop).
+          </p>
+        </div>
+
+        <div class="panel">
+          <!-- ✅ 추가: 프리뷰 이미지 -->
+          <img class="preview" src="/images/games/blockzzle.webp" alt="Blockzzle preview" loading="lazy" />
+
+          <h3>Demo notes</h3>
+          <div class="kvs">
+            <div class="kv"><b>Ads</b><span>Mobile only</span></div>
+            <div class="kv"><b>Purchases</b><span>Mobile only</span></div>
+            <div class="kv"><b>Save</b><span>Browser local storage</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div class="links">
+          <a href="/privacy/">Privacy</a>
+          <a href="/terms/">Terms</a>
+          <a href="/contact/">Contact</a>
+        </div>
+        <div>© {{ now.Year }} Blockzzle</div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

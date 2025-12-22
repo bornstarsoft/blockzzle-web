@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  {{ partial "head.html" . }}
+</head>
+
+<body>
+  <div class="site">
+    <header class="topbar">
+      <a class="brand" href='{{ relURL "/" }}'>
+        <span class="dot"></span>
+        <span class="name">{{ .Site.Title }}</span>
+      </a>
+
+      <nav class="topnav">
+        <a href='{{ relURL "play/" }}'>WebGL Demo</a>
+      </nav>
+    </header>
+
+    <main class="main">
+      {{ block "main" . }}{{ end }}
+    </main>
+
+    <footer class="footer">
+      <div class="footer-links">
+        {{ range .Site.Params.footer_menu }}
+        <a href="{{ .url | relURL }}">{{ .name }}</a>
+        {{ end }}
+      </div>
+      <div class="footer-copy">© {{ now.Year }} Blockzzle</div>
+    </footer>
+  </div>
+</body>
+
+</html>

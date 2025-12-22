@@ -10,6 +10,7 @@
 
 /*.unityweb
   Content-Type: application/octet-stream
+  Content-Encoding: br
 
 /*.data.unityweb
   Content-Type: application/octet-stream

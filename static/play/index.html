@@ -6,7 +6,10 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <title>Unity Web Player | Blockzzle</title>
 
-  <!-- ✅ Overlay CSS -->
+  <!-- ✅ FIX: viewport는 JS로 넣지 말고 head에 고정 -->
+  <meta name="viewport"
+    content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+
   <style>
     html,
     body {
@@ -21,13 +24,25 @@
       background: #0b1220;
     }
 
+    /* ✅ Unity canvas 기본 */
+    #unity-canvas {
+      background: #231f20;
+      display: block;
+      margin: 0 auto;
+      z-index: 0;
+      position: relative;
+      /* 기본: PC에서는 중앙 */
+      width: 540px;
+      height: 960px;
+    }
+
     /* Top overlay */
     #bssOverlay {
       position: fixed;
       top: 12px;
       left: 12px;
       right: 12px;
-      z-index: 9999;
+      z-index: 100000;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -109,6 +124,65 @@
         display: none;
       }
     }
+
+    /* ✅ Mobile bottom sticky CTA */
+    #bssStickyCta {
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      bottom: calc(12px + env(safe-area-inset-bottom));
+      z-index: 100000;
+      display: none;
+      /* 기본 숨김 */
+      pointer-events: none;
+      /* 컨테이너는 터치 막지 않게 */
+    }
+
+    #bssStickyCta .bss-sticky-btn {
+      height: 52px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 16px;
+      text-decoration: none;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: #06121f;
+      background: linear-gradient(135deg, #41c6ff, #2dd4bf);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      pointer-events: auto;
+      /* 버튼만 터치 받기 */
+    }
+
+    /* ✅ 터치(모바일/태블릿)에서만 스티키 보이기: 폭 기반보다 안정적 */
+    @media (hover: none) and (pointer: coarse) {
+      #bssStickyCta {
+        display: block;
+      }
+
+      body {
+        padding-bottom: 86px;
+      }
+
+      /* 스티키가 내용 가리지 않게 여백 */
+    }
+
+    /* ✅ 터치기기에서는 캔버스 꽉 채우기 */
+    @media (hover: none) and (pointer: coarse) {
+      #unity-canvas {
+        width: 100vw;
+        height: 100vh;
+        position: fixed;
+        left: 0;
+        top: 0;
+        margin: 0;
+      }
+
+      body {
+        text-align: left;
+      }
+    }
   </style>
 </head>
 
@@ -130,10 +204,11 @@
   </div>
 
   <!-- ✅ Unity canvas -->
-  <canvas id="unity-canvas" width="540" height="960" tabindex="-1"
-    style="width: 540px; height: 960px; background: #231f20;"></canvas>
+  <canvas id="unity-canvas" width="540" height="960" tabindex="-1"></canvas>
 
+  <!-- ✅ Unity loader -->
   <script src="Build/Blockzzle_v5_web.loader.js"></script>
+
   <script>
     // ✅ Store URL
     const STORE_URL =
@@ -141,7 +216,8 @@
 
     function withUtm(url, content) {
       try {
-        const u = new URL(url);
+        // ✅ 상대경로도 안전하게 처리
+        const u = new URL(url, location.origin);
         u.searchParams.set("utm_source", "webgl");
         u.searchParams.set("utm_medium", "cta");
         u.searchParams.set("utm_campaign", "blockzzle_web");
@@ -152,11 +228,17 @@
       }
     }
 
-    const getApp = document.getElementById("bssGetApp");
-    if (getApp) getApp.href = withUtm(STORE_URL, "play_overlay_top");
-
-    // ✅ 모바일 판별 (간단 UA)
+    // ✅ UA 기반 모바일 판별 (Fullscreen 버튼 제어용)
     const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    // ✅ 버튼 링크 세팅 (DOM 보장)
+    window.addEventListener("DOMContentLoaded", () => {
+      const stickyPlay = document.getElementById("bssStickyPlay");
+      if (stickyPlay) stickyPlay.href = withUtm("/play/", "play_sticky_bottom");
+
+      const getApp = document.getElementById("bssGetApp");
+      if (getApp) getApp.href = withUtm(STORE_URL, "play_overlay_top");
+    });
 
     // ✅ Fullscreen 버튼: 모바일에서만 보이게 (PC에서는 숨김)
     const fsBtn = document.getElementById("bssFullscreen");
@@ -166,8 +248,6 @@
       } else {
         fsBtn.addEventListener("click", async () => {
           try {
-            // ✅ Unity SetFullscreen(1) 절대 호출하지 않음 (가로로 깨지는 주범)
-            // ✅ 브라우저 fullscreen만 시도 (모바일은 지원/제약이 기기마다 다름)
             const el = document.getElementById("unity-canvas") || document.body;
             if (el.requestFullscreen) await el.requestFullscreen();
             else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
@@ -176,24 +256,6 @@
           }
         });
       }
-    }
-
-    // ✅ Mobile UA일 때 canvas full
-    if (IS_MOBILE) {
-      var meta = document.createElement("meta");
-      meta.name = "viewport";
-      meta.content =
-        "width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes";
-      document.getElementsByTagName("head")[0].appendChild(meta);
-
-      var canvas = document.querySelector("#unity-canvas");
-      canvas.style.width = "100%";
-      canvas.style.height = "100%";
-      canvas.style.position = "fixed";
-      canvas.style.left = "0";
-      canvas.style.top = "0";
-
-      document.body.style.textAlign = "left";
     }
 
     // ✅ Unity boot
@@ -213,7 +275,33 @@
       .catch((message) => {
         alert(message);
       });
+
+    // ✅ WebAudio 잠금 해제: 최초 유저 제스처 1회에만 resume
+    function resumeWebAudioOnce() {
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+
+        const ctx = window.__bssAudioCtx || (window.__bssAudioCtx = new AC());
+        if (ctx.state === "suspended") ctx.resume().catch(() => { });
+      } catch (e) { }
+
+      window.removeEventListener("pointerdown", resumeWebAudioOnce);
+      window.removeEventListener("touchstart", resumeWebAudioOnce);
+      window.removeEventListener("mousedown", resumeWebAudioOnce);
+      window.removeEventListener("keydown", resumeWebAudioOnce);
+    }
+
+    window.addEventListener("pointerdown", resumeWebAudioOnce, { once: true });
+    window.addEventListener("touchstart", resumeWebAudioOnce, { once: true });
+    window.addEventListener("mousedown", resumeWebAudioOnce, { once: true });
+    window.addEventListener("keydown", resumeWebAudioOnce, { once: true });
   </script>
+
+  <!-- ✅ Mobile sticky CTA (Play Now) -->
+  <div id="bssStickyCta" aria-label="Play Blockzzle demo">
+    <a id="bssStickyPlay" class="bss-sticky-btn" href="/play/">▶ Play Now</a>
+  </div>
 </body>
 
 </html>

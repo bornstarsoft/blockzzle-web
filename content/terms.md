@@ -13,7 +13,7 @@ Welcome to **Blockzzle**. By accessing or using this website, you agree to these
 If you do not agree, please do not use the site.
 
 ## 1) Website purpose
-Blockzzle provides a WebGL demo and related links (including mobile app store links). Content is provided **“as is”** for informational and entertainment purposes.
+Blockzzle provides a browser-playable block puzzle game and related website pages. Content is provided **“as is”** for informational and entertainment purposes.
 
 ## 2) No warranties
 We do not guarantee:
@@ -24,8 +24,7 @@ We do not guarantee:
 Your use of the website is at your own risk.
 
 ## 3) Third-party links
-This site may link to third-party services (e.g., Google Play / App Store). We are not responsible for their content, policies, pricing, or availability.  
-Any purchases or interactions with third parties are between you and that third party.
+This site may link to third-party services for hosting, browser game libraries, or support contact paths. We are not responsible for their content, policies, pricing, or availability.
 
 ## 4) Acceptable use
 You agree not to:

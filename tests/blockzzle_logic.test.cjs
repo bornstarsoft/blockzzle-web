@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v009.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v010.js");
 
 function piece(cells, id = "test", color = 0) {
   return { id, cells, color };
@@ -132,6 +132,29 @@ test("saved sound on primes audio on the next user gesture", () => {
   assert.strictEqual(BlockzzleCore.shouldPrimeAudioOnGesture(true, "suspended"), true);
   assert.strictEqual(BlockzzleCore.shouldPrimeAudioOnGesture(true, "running"), false);
   assert.strictEqual(BlockzzleCore.shouldPrimeAudioOnGesture(true, "closed"), true);
+});
+
+test("saved sound on stays pending until a gesture unlocks audio", () => {
+  assert.deepStrictEqual(BlockzzleCore.getAudioUnlockStatus(false, null, false), {
+    pending: false,
+    ready: false,
+  });
+  assert.deepStrictEqual(BlockzzleCore.getAudioUnlockStatus(true, null, false), {
+    pending: true,
+    ready: false,
+  });
+  assert.deepStrictEqual(BlockzzleCore.getAudioUnlockStatus(true, "running", false), {
+    pending: true,
+    ready: false,
+  });
+  assert.deepStrictEqual(BlockzzleCore.getAudioUnlockStatus(true, "suspended", false), {
+    pending: true,
+    ready: false,
+  });
+  assert.deepStrictEqual(BlockzzleCore.getAudioUnlockStatus(true, "running", true), {
+    pending: false,
+    ready: true,
+  });
 });
 
 test("placed board cells stay full opacity while previews stay translucent", () => {

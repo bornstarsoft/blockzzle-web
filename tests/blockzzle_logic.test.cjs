@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v001.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v002.js");
 
 function piece(cells, id = "test") {
   return { id, cells, color: 0 };
@@ -120,4 +120,20 @@ test("restart clears the board and preserves high score", () => {
   assert.strictEqual(game.highScore, 320);
   assert.strictEqual(storage.blockzzleHighScoreV1, "320");
   assert.strictEqual(game.board.flat().every((cell) => cell === 0), true);
+});
+
+test("restart recovers from game over with a fresh tray", () => {
+  const game = makeGame({ shapes: [piece([[0, 0], [1, 0]], "two-wide")] });
+  for (let y = 0; y < game.height; y += 1) {
+    for (let x = 0; x < game.width; x += 1) {
+      game.board[y][x] = 1;
+    }
+  }
+  game.board[0][0] = 0;
+  game.checkGameOver();
+
+  game.restart();
+
+  assert.strictEqual(game.gameOver, false);
+  assert.strictEqual(game.tray.filter(Boolean).length, 3);
 });

@@ -165,6 +165,7 @@ The leaderboard UI should not crowd the live play HUD. Keep submission and rank 
 - Add static/mock UI behind a local fixture or disabled state.
 - Make copy honest: `Leaderboard preview` or `Coming later`.
 - Do not accept submissions.
+- Good first placement: homepage teaser plus a lightweight `/leaderboard/` information page that links back to `/play/`.
 
 ### Phase 3: Backend Submit/Read API
 

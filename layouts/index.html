@@ -279,6 +279,33 @@
       text-align: right;
     }
 
+    .leaderboard-teaser {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: center;
+      padding: 22px 28px;
+      border-top: 1px solid var(--border);
+      background: rgba(0, 0, 0, .16);
+    }
+
+    .leaderboard-teaser h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .leaderboard-teaser p {
+      max-width: 660px;
+    }
+
+    .leaderboard-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
     .footer {
       display: flex;
       justify-content: space-between;
@@ -344,6 +371,15 @@
       .feature {
         align-items: flex-start;
       }
+
+      .leaderboard-teaser {
+        grid-template-columns: 1fr;
+        padding: 20px;
+      }
+
+      .leaderboard-actions {
+        justify-content: stretch;
+      }
     }
   </style>
 </head>
@@ -399,6 +435,17 @@
           </div>
         </section>
       </div>
+
+      <section class="leaderboard-teaser" aria-labelledby="leaderboard-preview">
+        <div>
+          <h2 id="leaderboard-preview">Leaderboard preview</h2>
+          <p>Anonymous leaderboard coming soon. Your score is saved locally for now, and Today Top 100 plus All-Time Top 100 are planned.</p>
+        </div>
+        <div class="leaderboard-actions">
+          <a class="btn primary" href="/play/">Play Blockzzle Online</a>
+          <a class="btn" href="/leaderboard/">Leaderboard Preview</a>
+        </div>
+      </section>
 
       <div class="footer">
         <div class="links">

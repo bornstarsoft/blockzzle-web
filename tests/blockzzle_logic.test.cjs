@@ -1,8 +1,8 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v005.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v006.js");
 
-function piece(cells, id = "test") {
-  return { id, cells, color: 0 };
+function piece(cells, id = "test", color = 0) {
+  return { id, cells, color };
 }
 
 function makeGame(options = {}) {
@@ -70,6 +70,25 @@ test("drag hit testing maps the visible piece center to the intended board origi
   const cell = BlockzzleCore.getDragPlacementCell(pieceShape, pointer, layout, lift);
 
   assert.deepStrictEqual(cell, { x: 4, y: 0 });
+});
+
+test("drag preview style uses the selected piece color", () => {
+  const validStyle = BlockzzleCore.getPreviewCellStyle(piece([[0, 0]], "purple", 4), true);
+  const invalidStyle = BlockzzleCore.getPreviewCellStyle(piece([[0, 0]], "purple", 4), false);
+
+  assert.strictEqual(validStyle.fill, "#a78bfa");
+  assert.strictEqual(invalidStyle.fill, "#a78bfa");
+  assert.strictEqual(validStyle.strokeColor, 0xa78bfa);
+  assert.strictEqual(invalidStyle.strokeColor, 0xfb7185);
+  assert.ok(validStyle.alpha > invalidStyle.alpha);
+  assert.ok(validStyle.alpha < 1);
+});
+
+test("invalid drop return scale shrinks the drag ghost toward the tray", () => {
+  const scale = BlockzzleCore.getReturnGhostScale(32, 22);
+
+  assert.ok(scale < 22 / 32);
+  assert.ok(scale >= 0.58);
 });
 
 test("places cells, clears full rows and columns, and scores the move", () => {

@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v004.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v005.js");
 
 function piece(cells, id = "test") {
   return { id, cells, color: 0 };
@@ -38,6 +38,18 @@ test("uses an 8x8 board and 3-piece tray by default", () => {
   assert.strictEqual(game.tray.filter(Boolean).length, 3);
 });
 
+test("new tray pieces use stable varied colors", () => {
+  const game = makeGame({
+    shapes: [
+      piece([[0, 0]], "a"),
+      piece([[0, 0]], "b"),
+      piece([[0, 0]], "c"),
+    ],
+  });
+
+  assert.deepStrictEqual(game.tray.map((trayPiece) => trayPiece.color), [0, 1, 2]);
+});
+
 test("rejects out-of-bounds and occupied placements", () => {
   const game = makeGame();
   const twoWide = piece([[0, 0], [1, 0]], "two-wide");
@@ -47,6 +59,17 @@ test("rejects out-of-bounds and occupied placements", () => {
   assert.strictEqual(game.getPlacementFailureReason(twoWide, 7, 0), "out_of_bounds");
   assert.strictEqual(game.canPlace(piece([[0, 0]], "single"), 2, 2), false);
   assert.strictEqual(game.getPlacementFailureReason(piece([[0, 0]], "single"), 2, 2), "occupied");
+});
+
+test("drag hit testing maps the visible piece center to the intended board origin", () => {
+  const pieceShape = piece([[0, 0], [1, 0], [2, 0], [3, 0]], "four-wide");
+  const layout = { boardOrigin: { x: 10, y: 100 }, cellSize: 40 };
+  const pointer = { x: 250, y: 428 };
+  const lift = { x: 0, y: -28 };
+
+  const cell = BlockzzleCore.getDragPlacementCell(pieceShape, pointer, layout, lift);
+
+  assert.deepStrictEqual(cell, { x: 4, y: 0 });
 });
 
 test("places cells, clears full rows and columns, and scores the move", () => {

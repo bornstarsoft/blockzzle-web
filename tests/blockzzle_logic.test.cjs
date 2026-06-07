@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v013.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v014.js");
 
 function piece(cells, id = "test", color = 0) {
   return { id, cells, color };
@@ -119,6 +119,54 @@ test("saved sound on is not restored as a ready state after page load", () => {
   assert.strictEqual(BlockzzleCore.shouldRestoreSoundOnPageLoad(null), false);
   assert.strictEqual(BlockzzleCore.shouldRestoreSoundOnPageLoad("false"), false);
   assert.strictEqual(BlockzzleCore.shouldRestoreSoundOnPageLoad("true"), false);
+});
+
+test("local today key uses the browser calendar date", () => {
+  assert.strictEqual(BlockzzleCore.getTodayKey(new Date(2026, 5, 7, 23, 30)), "2026-06-07");
+  assert.strictEqual(BlockzzleCore.getTodayKey(new Date(2026, 0, 9, 2, 15)), "2026-01-09");
+});
+
+test("repeat stats reset today best when the local date changes", () => {
+  const stats = BlockzzleCore.normalizeRepeatStats({
+    todayBestDate: "2026-06-06",
+    todayBest: "1200",
+    gamesPlayed: "4",
+    lastScore: "300",
+    bestLines: "9",
+  }, "2026-06-07");
+
+  assert.strictEqual(stats.todayBestDate, "2026-06-07");
+  assert.strictEqual(stats.todayBest, 0);
+  assert.strictEqual(stats.gamesPlayed, 4);
+  assert.strictEqual(stats.lastScore, 300);
+  assert.strictEqual(stats.bestLines, 9);
+});
+
+test("completed game stats update games played, last score, today best, and best lines", () => {
+  const first = BlockzzleCore.completeRepeatStats({
+    todayBestDate: "2026-06-07",
+    todayBest: 500,
+    gamesPlayed: 2,
+    lastScore: 440,
+    bestLines: 6,
+  }, 720, 5, "2026-06-07");
+
+  assert.deepStrictEqual(first, {
+    todayBestDate: "2026-06-07",
+    todayBest: 720,
+    gamesPlayed: 3,
+    lastScore: 720,
+    bestLines: 6,
+  });
+
+  const second = BlockzzleCore.completeRepeatStats(first, 410, 8, "2026-06-07");
+  assert.deepStrictEqual(second, {
+    todayBestDate: "2026-06-07",
+    todayBest: 720,
+    gamesPlayed: 4,
+    lastScore: 410,
+    bestLines: 8,
+  });
 });
 
 test("sound cue definitions stay subtle and asset-free", () => {

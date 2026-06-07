@@ -6,18 +6,36 @@
   <meta name="viewport"
     content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
   <meta name="theme-color" content="#10192a" />
-  <meta name="description" content="Blockzzle is a free block puzzle game. No install. Just play." />
-  <title>Blockzzle</title>
+  <meta name="description"
+    content="Play Blockzzle, a free online block puzzle game in your browser. No install needed: drag blocks, clear rows or columns, and keep going for a high score." />
+  <title>Blockzzle — Free Block Puzzle Game Online</title>
   <link rel="stylesheet" href="/play/css/blockzzle.v002.css" />
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "Blockzzle",
+      "genre": ["Block puzzle", "Puzzle", "Casual game"],
+      "gamePlatform": ["Web browser", "HTML5"],
+      "url": "https://blockzzle.com/play/",
+      "description": "Blockzzle is a free online block puzzle game playable in a browser with no install."
+    }
+  </script>
 </head>
 
 <body>
   <main class="play-shell" aria-label="Blockzzle game">
+    <section
+      style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;"
+      aria-labelledby="blockzzle-play-title">
+      <h1 id="blockzzle-play-title">Blockzzle — Free Block Puzzle Game</h1>
+      <p>Drag blocks onto the board. Fill rows or columns to clear lines. Keep going for a high score.</p>
+    </section>
     <div id="blockzzle-game" class="game-stage" role="application" aria-label="Blockzzle"></div>
     <noscript>
       <section class="noscript-card">
-        <h1>Blockzzle</h1>
-        <p>JavaScript is required to play this block puzzle game in your browser.</p>
+        <h1>Blockzzle — Free Block Puzzle Game</h1>
+        <p>JavaScript is required to play this free online block puzzle game in your browser.</p>
       </section>
     </noscript>
   </main>

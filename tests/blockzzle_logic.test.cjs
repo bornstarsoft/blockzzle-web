@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v019.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v020.js");
 
 function piece(cells, id = "test", color = 0) {
   return { id, cells, color };
@@ -105,6 +105,15 @@ test("tray piece size keeps tall pieces inside square tray slots", () => {
 
   assert.ok(layout.slotHeight >= layout.slotWidth - 10);
   assert.ok(BlockzzleCore.pieceFitsInSlot(tallPiece, layout.trayPieceSize, layout.slotWidth, layout.slotHeight));
+});
+
+test("mobile touch edge inset keeps board away from iPhone screen edges", () => {
+  const compactInset = BlockzzleCore.getTouchEdgeInset({ width: 390, compact: true });
+  const wideInset = BlockzzleCore.getTouchEdgeInset({ width: 1180, compact: false });
+
+  assert.ok(compactInset >= 18);
+  assert.ok(compactInset <= 22);
+  assert.strictEqual(wideInset, 22);
 });
 
 test("orientation changes use delayed multi-pass relayout on mobile browsers", () => {

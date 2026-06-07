@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v020.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v021.js");
 
 function piece(cells, id = "test", color = 0) {
   return { id, cells, color };
@@ -191,6 +191,76 @@ test("completed game stats update games played, last score, today best, best lin
     bestLines: 8,
     bestClearLines: 4,
   });
+});
+
+test("same local date produces the same daily piece sequence", () => {
+  const shapes = [
+    piece([[0, 0]], "single"),
+    piece([[0, 0], [1, 0]], "two_h"),
+    piece([[0, 0], [0, 1]], "two_v"),
+    piece([[0, 0], [1, 0], [0, 1]], "corner"),
+  ];
+
+  const first = BlockzzleCore.getDailyPieceSequence("2026-06-08", shapes, 12);
+  const second = BlockzzleCore.getDailyPieceSequence("2026-06-08", shapes, 12);
+
+  assert.deepStrictEqual(first, second);
+});
+
+test("different local dates produce different daily piece sequences", () => {
+  const shapes = [
+    piece([[0, 0]], "single"),
+    piece([[0, 0], [1, 0]], "two_h"),
+    piece([[0, 0], [0, 1]], "two_v"),
+    piece([[0, 0], [1, 0], [0, 1]], "corner"),
+  ];
+
+  const today = BlockzzleCore.getDailyPieceSequence("2026-06-08", shapes, 12);
+  const tomorrow = BlockzzleCore.getDailyPieceSequence("2026-06-09", shapes, 12);
+
+  assert.notDeepStrictEqual(today, tomorrow);
+});
+
+test("daily stats reset when the local date changes", () => {
+  const stats = BlockzzleCore.normalizeDailyStats({
+    dailyDate: "2026-06-07",
+    dailyBestScore: "1800",
+    dailyBestLines: "12",
+    dailyBestClear: "4",
+    dailyPlays: "3",
+    dailyLastScore: "900",
+  }, "2026-06-08");
+
+  assert.deepStrictEqual(stats, {
+    dailyDate: "2026-06-08",
+    dailyBestScore: 0,
+    dailyBestLines: 0,
+    dailyBestClear: 0,
+    dailyPlays: 0,
+    dailyLastScore: 0,
+  });
+});
+
+test("completed daily stats update only daily challenge fields", () => {
+  const stats = BlockzzleCore.completeDailyStats({
+    dailyDate: "2026-06-08",
+    dailyBestScore: 1200,
+    dailyBestLines: 8,
+    dailyBestClear: 3,
+    dailyPlays: 2,
+    dailyLastScore: 700,
+  }, 1500, 6, "2026-06-08", 4);
+
+  assert.deepStrictEqual(stats, {
+    dailyDate: "2026-06-08",
+    dailyBestScore: 1500,
+    dailyBestLines: 8,
+    dailyBestClear: 4,
+    dailyPlays: 3,
+    dailyLastScore: 1500,
+  });
+  assert.strictEqual(Object.prototype.hasOwnProperty.call(stats, "gamesPlayed"), false);
+  assert.strictEqual(Object.prototype.hasOwnProperty.call(stats, "todayBest"), false);
 });
 
 test("clear tier labels make multi-line clears distinct", () => {

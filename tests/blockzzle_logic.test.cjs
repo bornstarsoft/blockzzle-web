@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v012.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v013.js");
 
 function piece(cells, id = "test", color = 0) {
   return { id, cells, color };
@@ -113,6 +113,12 @@ test("sound preference is off by default and uses compact labels", () => {
   assert.strictEqual(BlockzzleCore.parseSoundPreference("false"), false);
   assert.strictEqual(BlockzzleCore.getSoundToggleLabel(false), "Sound Off");
   assert.strictEqual(BlockzzleCore.getSoundToggleLabel(true), "Sound On");
+});
+
+test("saved sound on is not restored as a ready state after page load", () => {
+  assert.strictEqual(BlockzzleCore.shouldRestoreSoundOnPageLoad(null), false);
+  assert.strictEqual(BlockzzleCore.shouldRestoreSoundOnPageLoad("false"), false);
+  assert.strictEqual(BlockzzleCore.shouldRestoreSoundOnPageLoad("true"), false);
 });
 
 test("sound cue definitions stay subtle and asset-free", () => {

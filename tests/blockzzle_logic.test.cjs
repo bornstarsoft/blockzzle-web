@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v015.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v016.js");
 
 function piece(cells, id = "test", color = 0) {
   return { id, cells, color };
@@ -180,6 +180,31 @@ test("clear tier labels make multi-line clears distinct", () => {
   assert.strictEqual(BlockzzleCore.getClearTier(3).label, "Triple Clear!");
   assert.strictEqual(BlockzzleCore.getClearTier(4).label, "Mega Clear!");
   assert.strictEqual(BlockzzleCore.getClearTier(5).label, "Ultra Clear!");
+});
+
+test("score tiers use honest local goal labels", () => {
+  assert.deepStrictEqual(BlockzzleCore.getScoreTier(0), {
+    label: "Rookie",
+    minScore: 0,
+    nextLabel: "Beginner",
+    nextScore: 1000,
+  });
+  assert.strictEqual(BlockzzleCore.getScoreTier(1000).label, "Beginner");
+  assert.strictEqual(BlockzzleCore.getScoreTier(3000).label, "Skilled");
+  assert.strictEqual(BlockzzleCore.getScoreTier(5000).label, "Expert");
+  assert.strictEqual(BlockzzleCore.getScoreTier(10000).label, "Master");
+  assert.deepStrictEqual(BlockzzleCore.getScoreTier(20000), {
+    label: "World Class",
+    minScore: 20000,
+    nextLabel: "",
+    nextScore: 0,
+  });
+});
+
+test("score tier goal text names the next reachable tier", () => {
+  assert.strictEqual(BlockzzleCore.getScoreTierGoalText(570), "Next: Beginner 1,000");
+  assert.strictEqual(BlockzzleCore.getScoreTierGoalText(6400), "Next: Master 10,000");
+  assert.strictEqual(BlockzzleCore.getScoreTierGoalText(20000), "Top local tier reached");
 });
 
 test("sound cue definitions stay subtle and asset-free", () => {

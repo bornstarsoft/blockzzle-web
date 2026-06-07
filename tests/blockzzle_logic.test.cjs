@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v010.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v011.js");
 
 function piece(cells, id = "test", color = 0) {
   return { id, cells, color };
@@ -124,6 +124,15 @@ test("sound cue definitions stay subtle and asset-free", () => {
   assert.strictEqual(cues.gameOver.type, "down");
   assert.ok(cues.clear.volume <= 0.12);
   assert.ok(cues.place.durationMs <= 120);
+});
+
+test("gesture audio unlock uses a near-silent oscillator cue", () => {
+  const cue = BlockzzleCore.AUDIO_UNLOCK_CUE;
+
+  assert.strictEqual(cue.type, "unlock");
+  assert.strictEqual(cue.wave, "sine");
+  assert.ok(cue.volume <= 0.002);
+  assert.ok(cue.durationMs <= 70);
 });
 
 test("saved sound on primes audio on the next user gesture", () => {

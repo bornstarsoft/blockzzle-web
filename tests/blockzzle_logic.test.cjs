@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v002.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v003.js");
 
 function piece(cells, id = "test") {
   return { id, cells, color: 0 };

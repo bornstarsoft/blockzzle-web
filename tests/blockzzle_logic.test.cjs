@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v007.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v008.js");
 
 function piece(cells, id = "test", color = 0) {
   return { id, cells, color };
@@ -105,6 +105,25 @@ test("tray piece size keeps tall pieces inside square tray slots", () => {
 
   assert.ok(layout.slotHeight >= layout.slotWidth - 10);
   assert.ok(BlockzzleCore.pieceFitsInSlot(tallPiece, layout.trayPieceSize, layout.slotWidth, layout.slotHeight));
+});
+
+test("sound preference is off by default and uses compact labels", () => {
+  assert.strictEqual(BlockzzleCore.parseSoundPreference(null), false);
+  assert.strictEqual(BlockzzleCore.parseSoundPreference("true"), true);
+  assert.strictEqual(BlockzzleCore.parseSoundPreference("false"), false);
+  assert.strictEqual(BlockzzleCore.getSoundToggleLabel(false), "Sound Off");
+  assert.strictEqual(BlockzzleCore.getSoundToggleLabel(true), "Sound On");
+});
+
+test("sound cue definitions stay subtle and asset-free", () => {
+  const cues = BlockzzleCore.SOUND_CUES;
+
+  assert.strictEqual(cues.place.type, "pop");
+  assert.strictEqual(cues.invalid.type, "thud");
+  assert.strictEqual(cues.clear.type, "chime");
+  assert.strictEqual(cues.gameOver.type, "down");
+  assert.ok(cues.clear.volume <= 0.12);
+  assert.ok(cues.place.durationMs <= 120);
 });
 
 test("places cells, clears full rows and columns, and scores the move", () => {

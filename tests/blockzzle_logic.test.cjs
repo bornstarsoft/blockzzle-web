@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v011.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v012.js");
 
 function piece(cells, id = "test", color = 0) {
   return { id, cells, color };
@@ -126,12 +126,13 @@ test("sound cue definitions stay subtle and asset-free", () => {
   assert.ok(cues.place.durationMs <= 120);
 });
 
-test("gesture audio unlock uses a near-silent oscillator cue", () => {
+test("gesture audio unlock uses a short low-volume oscillator test tick", () => {
   const cue = BlockzzleCore.AUDIO_UNLOCK_CUE;
 
   assert.strictEqual(cue.type, "unlock");
   assert.strictEqual(cue.wave, "sine");
-  assert.ok(cue.volume <= 0.002);
+  assert.ok(cue.volume > 0.002);
+  assert.ok(cue.volume <= 0.02);
   assert.ok(cue.durationMs <= 70);
 });
 
@@ -164,6 +165,18 @@ test("saved sound on stays pending until a gesture unlocks audio", () => {
     pending: false,
     ready: true,
   });
+  assert.deepStrictEqual(BlockzzleCore.getAudioUnlockStatus(true, null, true), {
+    pending: true,
+    ready: false,
+  });
+});
+
+test("sound unlock attempts are throttled while pending", () => {
+  assert.strictEqual(BlockzzleCore.shouldAttemptAudioUnlock(false, false, 5000, 0), false);
+  assert.strictEqual(BlockzzleCore.shouldAttemptAudioUnlock(true, true, 5000, 0), false);
+  assert.strictEqual(BlockzzleCore.shouldAttemptAudioUnlock(true, false, 5000, 0), true);
+  assert.strictEqual(BlockzzleCore.shouldAttemptAudioUnlock(true, false, 5000, 4900), false);
+  assert.strictEqual(BlockzzleCore.shouldAttemptAudioUnlock(true, false, 5000, 4200), true);
 });
 
 test("placed board cells stay full opacity while previews stay translucent", () => {

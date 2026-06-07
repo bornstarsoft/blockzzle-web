@@ -1,0 +1,89 @@
+:root {
+  --page-bg: #0f1724;
+  --panel-bg: #172238;
+  --text: #f8fbff;
+  --muted: #b8c4d8;
+  --accent: #2dd4bf;
+  --blockzzle-viewport-width: 100vw;
+  --blockzzle-viewport-height: 100dvh;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: var(--blockzzle-viewport-height);
+  margin: 0;
+  overflow: hidden;
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
+body {
+  min-height: var(--blockzzle-viewport-height);
+  position: fixed;
+  inset: 0;
+}
+
+.play-shell {
+  position: fixed;
+  inset: 0;
+  width: var(--blockzzle-viewport-width);
+  height: var(--blockzzle-viewport-height);
+  min-height: var(--blockzzle-viewport-height);
+  overflow: hidden;
+  background:
+    linear-gradient(155deg, rgba(45, 212, 191, 0.12), transparent 38%),
+    linear-gradient(25deg, rgba(251, 113, 133, 0.08), transparent 42%),
+    linear-gradient(180deg, #10192a 0%, #0b1220 100%);
+  padding:
+    env(safe-area-inset-top)
+    env(safe-area-inset-right)
+    env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+}
+
+.game-stage {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.game-stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.noscript-card {
+  position: fixed;
+  inset: 20px;
+  display: grid;
+  place-content: center;
+  gap: 10px;
+  max-width: 420px;
+  max-height: 220px;
+  margin: auto;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--panel-bg);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.noscript-card h1,
+.noscript-card p {
+  margin: 0;
+}
+
+.noscript-card p {
+  color: var(--muted);
+}

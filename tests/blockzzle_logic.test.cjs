@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v018.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v019.js");
 
 function piece(cells, id = "test", color = 0) {
   return { id, cells, color };
@@ -105,6 +105,16 @@ test("tray piece size keeps tall pieces inside square tray slots", () => {
 
   assert.ok(layout.slotHeight >= layout.slotWidth - 10);
   assert.ok(BlockzzleCore.pieceFitsInSlot(tallPiece, layout.trayPieceSize, layout.slotWidth, layout.slotHeight));
+});
+
+test("orientation changes use delayed multi-pass relayout on mobile browsers", () => {
+  assert.deepStrictEqual(BlockzzleCore.getOrientationRelayoutDelays(), [0, 100, 300, 600]);
+});
+
+test("portrait prompt only appears for cramped mobile landscape viewports", () => {
+  assert.strictEqual(BlockzzleCore.shouldShowPortraitPrompt({ width: 844, height: 390 }), true);
+  assert.strictEqual(BlockzzleCore.shouldShowPortraitPrompt({ width: 390, height: 844 }), false);
+  assert.strictEqual(BlockzzleCore.shouldShowPortraitPrompt({ width: 1180, height: 720 }), false);
 });
 
 test("sound preference is off by default and uses compact labels", () => {

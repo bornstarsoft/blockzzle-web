@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v008.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v009.js");
 
 function piece(cells, id = "test", color = 0) {
   return { id, cells, color };
@@ -124,6 +124,37 @@ test("sound cue definitions stay subtle and asset-free", () => {
   assert.strictEqual(cues.gameOver.type, "down");
   assert.ok(cues.clear.volume <= 0.12);
   assert.ok(cues.place.durationMs <= 120);
+});
+
+test("saved sound on primes audio on the next user gesture", () => {
+  assert.strictEqual(BlockzzleCore.shouldPrimeAudioOnGesture(false, null), false);
+  assert.strictEqual(BlockzzleCore.shouldPrimeAudioOnGesture(true, null), true);
+  assert.strictEqual(BlockzzleCore.shouldPrimeAudioOnGesture(true, "suspended"), true);
+  assert.strictEqual(BlockzzleCore.shouldPrimeAudioOnGesture(true, "running"), false);
+  assert.strictEqual(BlockzzleCore.shouldPrimeAudioOnGesture(true, "closed"), true);
+});
+
+test("placed board cells stay full opacity while previews stay translucent", () => {
+  const placedStyle = BlockzzleCore.getBoardCellStyle({
+    value: 5,
+    isPreview: false,
+  });
+  const previewStyle = BlockzzleCore.getBoardCellStyle({
+    value: 0,
+    isPreview: true,
+    previewPiece: piece([[0, 0]], "purple", 4),
+    previewValid: true,
+  });
+  const clearStyle = BlockzzleCore.getBoardCellStyle({
+    value: 5,
+    isClearFlash: true,
+  });
+
+  assert.strictEqual(placedStyle.fill, "#a78bfa");
+  assert.strictEqual(placedStyle.alpha, 1);
+  assert.ok(previewStyle.alpha < 1);
+  assert.strictEqual(clearStyle.alpha, 1);
+  assert.ok(clearStyle.strokeWidth >= 3);
 });
 
 test("places cells, clears full rows and columns, and scores the move", () => {

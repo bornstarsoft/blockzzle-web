@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v014.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v015.js");
 
 function piece(cells, id = "test", color = 0) {
   return { id, cells, color };
@@ -133,6 +133,7 @@ test("repeat stats reset today best when the local date changes", () => {
     gamesPlayed: "4",
     lastScore: "300",
     bestLines: "9",
+    bestClearLines: "3",
   }, "2026-06-07");
 
   assert.strictEqual(stats.todayBestDate, "2026-06-07");
@@ -140,16 +141,18 @@ test("repeat stats reset today best when the local date changes", () => {
   assert.strictEqual(stats.gamesPlayed, 4);
   assert.strictEqual(stats.lastScore, 300);
   assert.strictEqual(stats.bestLines, 9);
+  assert.strictEqual(stats.bestClearLines, 3);
 });
 
-test("completed game stats update games played, last score, today best, and best lines", () => {
+test("completed game stats update games played, last score, today best, best lines, and best clear", () => {
   const first = BlockzzleCore.completeRepeatStats({
     todayBestDate: "2026-06-07",
     todayBest: 500,
     gamesPlayed: 2,
     lastScore: 440,
     bestLines: 6,
-  }, 720, 5, "2026-06-07");
+    bestClearLines: 3,
+  }, 720, 5, "2026-06-07", 2);
 
   assert.deepStrictEqual(first, {
     todayBestDate: "2026-06-07",
@@ -157,16 +160,26 @@ test("completed game stats update games played, last score, today best, and best
     gamesPlayed: 3,
     lastScore: 720,
     bestLines: 6,
+    bestClearLines: 3,
   });
 
-  const second = BlockzzleCore.completeRepeatStats(first, 410, 8, "2026-06-07");
+  const second = BlockzzleCore.completeRepeatStats(first, 410, 8, "2026-06-07", 4);
   assert.deepStrictEqual(second, {
     todayBestDate: "2026-06-07",
     todayBest: 720,
     gamesPlayed: 4,
     lastScore: 410,
     bestLines: 8,
+    bestClearLines: 4,
   });
+});
+
+test("clear tier labels make multi-line clears distinct", () => {
+  assert.strictEqual(BlockzzleCore.getClearTier(1).label, "Line Clear");
+  assert.strictEqual(BlockzzleCore.getClearTier(2).label, "Double Clear!");
+  assert.strictEqual(BlockzzleCore.getClearTier(3).label, "Triple Clear!");
+  assert.strictEqual(BlockzzleCore.getClearTier(4).label, "Mega Clear!");
+  assert.strictEqual(BlockzzleCore.getClearTier(5).label, "Ultra Clear!");
 });
 
 test("sound cue definitions stay subtle and asset-free", () => {
@@ -270,9 +283,51 @@ test("places cells, clears full rows and columns, and scores the move", () => {
   assert.strictEqual(result.columnsCleared, 1);
   assert.strictEqual(result.linesCleared, 2);
   assert.strictEqual(result.cellsCleared, 15);
-  assert.strictEqual(result.scoreDelta, 210);
-  assert.strictEqual(game.score, 210);
+  assert.strictEqual(result.clearBonus, 100);
+  assert.strictEqual(result.scoreDelta, 310);
+  assert.strictEqual(game.score, 310);
   assert.strictEqual(game.board[0][7], 0);
+});
+
+test("single-line clear keeps base line score without multi-line bonus", () => {
+  const game = makeGame();
+  fill(game, [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0]]);
+
+  const result = game.place(piece([[0, 0]], "single"), 7, 0);
+
+  assert.strictEqual(result.linesCleared, 1);
+  assert.strictEqual(result.clearBonus, 0);
+  assert.strictEqual(result.scoreDelta, 110);
+});
+
+test("double-line clear awards a bonus above base line score", () => {
+  const game = makeGame();
+  fill(game, [
+    [0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0],
+    [7, 1], [7, 2], [7, 3], [7, 4], [7, 5], [7, 6], [7, 7],
+  ]);
+
+  const result = game.place(piece([[0, 0]], "single"), 7, 0);
+
+  assert.strictEqual(result.linesCleared, 2);
+  assert.strictEqual(result.clearBonus, 100);
+  assert.strictEqual(result.scoreDelta, 310);
+});
+
+test("triple-line clear awards a bigger bonus than double-line clear", () => {
+  const game = makeGame();
+  fill(game, [
+    [0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0],
+    [6, 1], [6, 2], [6, 3], [6, 4], [6, 5], [6, 6], [6, 7],
+    [7, 1], [7, 2], [7, 3], [7, 4], [7, 5], [7, 6], [7, 7],
+  ]);
+
+  const result = game.place(piece([[0, 0], [1, 0]], "two-wide"), 6, 0);
+
+  assert.strictEqual(result.linesCleared, 3);
+  assert.strictEqual(result.clearBonus, 250);
+  assert.strictEqual(result.scoreDelta, 570);
+  assert.strictEqual(game.bestClearLinesThisGame, 3);
 });
 
 test("consumes a tray piece and refills only after all 3 pieces are placed", () => {

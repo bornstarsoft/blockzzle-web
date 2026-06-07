@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v006.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v007.js");
 
 function piece(cells, id = "test", color = 0) {
   return { id, cells, color };
@@ -85,10 +85,26 @@ test("drag preview style uses the selected piece color", () => {
 });
 
 test("invalid drop return scale shrinks the drag ghost toward the tray", () => {
-  const scale = BlockzzleCore.getReturnGhostScale(32, 22);
+  const scale = BlockzzleCore.getReturnGhostScale(44, 22);
 
-  assert.ok(scale < 22 / 32);
-  assert.ok(scale >= 0.58);
+  assert.strictEqual(scale, 0.5);
+});
+
+test("drag piece uses board-scale cells instead of tray-scale cells", () => {
+  assert.strictEqual(BlockzzleCore.getDragPieceSize(44), 44);
+  assert.ok(BlockzzleCore.getDragPieceSize(44) >= BlockzzleCore.getTrayPieceSize(44) * 2);
+});
+
+test("tray piece size keeps tall pieces inside square tray slots", () => {
+  const tallPiece = piece([[0, 0], [0, 1], [0, 2], [0, 3]], "four-v");
+  const layout = BlockzzleCore.getTraySlotLayout({
+    width: 390,
+    cellSize: 44,
+    bottomGap: 12,
+  });
+
+  assert.ok(layout.slotHeight >= layout.slotWidth - 10);
+  assert.ok(BlockzzleCore.pieceFitsInSlot(tallPiece, layout.trayPieceSize, layout.slotWidth, layout.slotHeight));
 });
 
 test("places cells, clears full rows and columns, and scores the move", () => {

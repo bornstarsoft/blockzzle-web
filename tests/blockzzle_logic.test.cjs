@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v022.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v023.js");
 
 function piece(cells, id = "test", color = 0) {
   return { id, cells, color };
@@ -230,6 +230,56 @@ test("score tier goal text names the next reachable tier", () => {
   assert.strictEqual(BlockzzleCore.getScoreTierGoalText(570), "Next: Beginner 1,000");
   assert.strictEqual(BlockzzleCore.getScoreTierGoalText(6400), "Next: Master 10,000");
   assert.strictEqual(BlockzzleCore.getScoreTierGoalText(20000), "Top local tier reached");
+});
+
+test("leaderboard nickname validation trims and restricts public names", () => {
+  assert.deepStrictEqual(BlockzzleCore.validateLeaderboardNickname(" Player_1 "), {
+    ok: true,
+    nickname: "Player_1",
+  });
+  assert.strictEqual(BlockzzleCore.validateLeaderboardNickname("A").ok, false);
+  assert.strictEqual(BlockzzleCore.validateLeaderboardNickname("Player!").ok, false);
+  assert.strictEqual(BlockzzleCore.validateLeaderboardNickname("badword").ok, false);
+});
+
+test("leaderboard submission validation rejects impossible MVP values", () => {
+  const valid = BlockzzleCore.validateLeaderboardSubmission({
+    nickname: "Player-1",
+    score: 1200,
+    lines: 12,
+    best_clear: 4,
+    tier: "Beginner",
+    duration_seconds: 120,
+    client_version: "v023",
+    browser_player_id: "bz_1234567890abcdef",
+  });
+
+  assert.strictEqual(valid.ok, true);
+  assert.strictEqual(valid.entry.nickname, "Player-1");
+  assert.strictEqual(valid.entry.score, 1200);
+  assert.strictEqual(valid.entry.best_clear, 4);
+  assert.strictEqual(BlockzzleCore.validateLeaderboardSubmission({ ...valid.entry, score: 1000001 }).ok, false);
+  assert.strictEqual(BlockzzleCore.validateLeaderboardSubmission({ ...valid.entry, duration_seconds: 4 }).ok, false);
+  assert.strictEqual(BlockzzleCore.validateLeaderboardSubmission({ ...valid.entry, duration_seconds: 8, score: 6000 }).ok, false);
+  assert.strictEqual(BlockzzleCore.validateLeaderboardSubmission({ ...valid.entry, best_clear: 17 }).ok, false);
+});
+
+test("browser player id generation stores one anonymous local id", () => {
+  const store = {};
+  const storage = {
+    getItem: (key) => store[key] || null,
+    setItem: (key, value) => {
+      store[key] = String(value);
+    },
+  };
+  const rng = () => 0.5;
+
+  const first = BlockzzleCore.getOrCreateBrowserPlayerId(storage, rng);
+  const second = BlockzzleCore.getOrCreateBrowserPlayerId(storage, () => 0.1);
+
+  assert.match(first, /^bz_[0-9a-f]{32}$/);
+  assert.strictEqual(second, first);
+  assert.strictEqual(store.blockzzleAnonPlayerIdV1, first);
 });
 
 test("sound cue definitions stay subtle and asset-free", () => {

@@ -18,7 +18,6 @@ pagerSize = 10
 
 [params]
   description = "Free block puzzle game. No install. Just play."
-  google_analytics = ""
 
 # [하단 필수 메뉴]
 [[params.footer_menu]]

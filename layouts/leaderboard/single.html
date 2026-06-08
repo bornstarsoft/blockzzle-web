@@ -1,0 +1,43 @@
+{{ define "main" }}
+<article class="page leaderboard-page">
+  <div class="leaderboard-hero">
+    <div>
+      <p class="eyebrow">Anonymous leaderboard</p>
+      <h1 class="page-title">Blockzzle Leaderboard</h1>
+      <p class="leaderboard-lead">Today Top 100 and All-Time Top 100 use real submitted scores only. No login required, nickname only.</p>
+    </div>
+    <a class="leaderboard-cta" href='{{ relURL "play/" }}'>Play Blockzzle Online</a>
+  </div>
+
+  <section class="leaderboard-board" aria-labelledby="leaderboard-title">
+    <div class="leaderboard-board-head">
+      <h2 id="leaderboard-title">Top Scores</h2>
+      <div class="leaderboard-tabs" role="group" aria-label="Leaderboard scope">
+        <button type="button" class="is-active" data-scope="today">Today Top 100</button>
+        <button type="button" data-scope="alltime">All-Time Top 100</button>
+      </div>
+    </div>
+
+    <p class="leaderboard-status" data-leaderboard-status>Loading leaderboard...</p>
+
+    <div class="leaderboard-table-wrap">
+      <table class="leaderboard-table" aria-label="Blockzzle leaderboard">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Nickname</th>
+            <th>Score</th>
+            <th>Lines</th>
+            <th>Best Clear</th>
+            <th>Tier</th>
+          </tr>
+        </thead>
+        <tbody data-leaderboard-rows></tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="leaderboard-note">If the leaderboard is unavailable, your in-game local stats still work in the browser.</p>
+</article>
+<script src='{{ relURL "js/leaderboard.v001.js" }}' defer></script>
+{{ end }}

@@ -1,0 +1,7 @@
+name = "blockzzle-web"
+pages_build_output_dir = "public"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "blockzzle_leaderboard"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"

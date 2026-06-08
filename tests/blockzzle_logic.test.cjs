@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v023.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v024.js");
 
 function piece(cells, id = "test", color = 0) {
   return { id, cells, color };
@@ -280,6 +280,19 @@ test("browser player id generation stores one anonymous local id", () => {
   assert.match(first, /^bz_[0-9a-f]{32}$/);
   assert.strictEqual(second, first);
   assert.strictEqual(store.blockzzleAnonPlayerIdV1, first);
+});
+
+test("leaderboard game-over layout centers submit and keeps play again inside panel", () => {
+  const layout = BlockzzleCore.getLeaderboardGameOverLayout({
+    centerX: 195,
+    centerY: 382,
+    panelHeight: 412,
+  });
+
+  assert.strictEqual(layout.submitButton.x, 195);
+  assert.strictEqual(layout.playAgainButton.x, 195);
+  assert.ok(layout.playAgainButton.bottom <= layout.panelBottom - 12);
+  assert.ok(layout.tabButtons.y > layout.submitButton.y);
 });
 
 test("sound cue definitions stay subtle and asset-free", () => {

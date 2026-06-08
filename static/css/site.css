@@ -143,6 +143,19 @@ body {
     color: #071018;
 }
 
+.leaderboard-cta:visited {
+    color: #071018;
+}
+
+.leaderboard-cta:hover {
+    color: #071018;
+}
+
+.leaderboard-page a:not(.leaderboard-cta),
+.leaderboard-page a:not(.leaderboard-cta):visited {
+    color: #bfdbfe;
+}
+
 .leaderboard-board {
     display: grid;
     gap: 14px;
@@ -238,6 +251,11 @@ body {
 }
 
 @media (max-width: 720px) {
+    .leaderboard-page {
+        padding: 18px;
+        border-radius: 18px;
+    }
+
     .leaderboard-hero,
     .leaderboard-board-head {
         display: grid;
@@ -245,5 +263,157 @@ body {
 
     .leaderboard-cta {
         text-align: center;
+    }
+
+    .leaderboard-board {
+        padding: 14px;
+        border-radius: 16px;
+        min-width: 0;
+    }
+
+    .leaderboard-tabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+    }
+
+    .leaderboard-tabs button {
+        min-width: 0;
+        padding: 10px 8px;
+        font-size: 13px;
+    }
+
+    .leaderboard-table-wrap {
+        overflow-x: visible;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .leaderboard-table,
+    .leaderboard-table thead,
+    .leaderboard-table tbody,
+    .leaderboard-table tr,
+    .leaderboard-table td {
+        display: block;
+    }
+
+    .leaderboard-table {
+        min-width: 0;
+        border-collapse: separate;
+    }
+
+    .leaderboard-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        clip-path: inset(50%);
+    }
+
+    .leaderboard-table tbody {
+        display: grid;
+        gap: 10px;
+    }
+
+    .leaderboard-table tr {
+        display: grid;
+        grid-template-columns: 42px minmax(0, 1fr);
+        grid-template-areas:
+            "rank name"
+            "rank score"
+            "rank lines"
+            "rank clear"
+            "rank tier";
+        gap: 6px 12px;
+        padding: 12px;
+        border: 1px solid rgba(255, 255, 255, .10);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, .04);
+    }
+
+    .leaderboard-table th,
+    .leaderboard-table td {
+        padding: 0;
+        border-bottom: 0;
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .leaderboard-table td:nth-child(1) {
+        grid-area: rank;
+        align-self: center;
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: rgba(142, 232, 210, .14);
+        color: #8ee8d2;
+        font-weight: 900;
+    }
+
+    .leaderboard-table td:nth-child(1)::before {
+        content: "#";
+    }
+
+    .leaderboard-table td:nth-child(2) {
+        grid-area: name;
+        font-weight: 900;
+        font-size: 15px;
+        line-height: 1.25;
+    }
+
+    .leaderboard-table td:nth-child(3) {
+        grid-area: score;
+        color: #ffffff;
+        font-weight: 900;
+    }
+
+    .leaderboard-table td:nth-child(3)::before,
+    .leaderboard-table td:nth-child(4)::before,
+    .leaderboard-table td:nth-child(5)::before {
+        color: var(--muted);
+        font-weight: 700;
+    }
+
+    .leaderboard-table td:nth-child(3)::before {
+        content: "Score ";
+    }
+
+    .leaderboard-table td:nth-child(4) {
+        grid-area: lines;
+        color: var(--muted);
+        font-size: 13px;
+    }
+
+    .leaderboard-table td:nth-child(4)::before {
+        content: "Lines ";
+    }
+
+    .leaderboard-table td:nth-child(5) {
+        grid-area: clear;
+        color: var(--muted);
+        font-size: 13px;
+    }
+
+    .leaderboard-table td:nth-child(5)::before {
+        content: "Best Clear ";
+    }
+
+    .leaderboard-table td:nth-child(6) {
+        grid-area: tier;
+        justify-self: start;
+        max-width: 100%;
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: rgba(250, 204, 21, .14);
+        color: #fde68a;
+        font-size: 12px;
+        font-weight: 900;
+        line-height: 1.2;
+        white-space: normal;
     }
 }

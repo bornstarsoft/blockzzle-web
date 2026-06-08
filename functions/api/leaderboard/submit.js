@@ -62,25 +62,41 @@ async function enforceSubmissionLimits(db, entry, dayKey, now) {
 }
 
 async function getScopedRank(db, score, dayKey) {
-  const scopedWhere = dayKey ? "AND day_key = ?" : "";
+  const scopedWhere = dayKey ? "AND s.day_key = ?" : "";
+  const betterScopedWhere = dayKey ? "AND better.day_key = s.day_key" : "";
   const bindings = dayKey ? [dayKey, score] : [score];
   const result = await db
     .prepare(`
-      WITH best_scores AS (
-        SELECT
-          score,
-          ROW_NUMBER() OVER (
-            PARTITION BY COALESCE(NULLIF(browser_player_id, ''), 'nickname:' || LOWER(nickname))
-            ORDER BY score DESC, created_at ASC
-          ) AS player_row
-        FROM blockzzle_scores
-        WHERE rejected = 0
-          ${scopedWhere}
-      )
       SELECT COUNT(*) + 1 AS rank
-      FROM best_scores
-      WHERE player_row = 1
-        AND score > ?
+      FROM blockzzle_scores s
+      WHERE s.rejected = 0
+        ${scopedWhere}
+        AND s.score > ?
+        AND NOT EXISTS (
+          SELECT 1
+          FROM blockzzle_scores better
+          WHERE better.rejected = 0
+            ${betterScopedWhere}
+            AND LOWER(TRIM(better.nickname)) = LOWER(TRIM(s.nickname))
+            AND (
+              better.score > s.score
+              OR (better.score = s.score AND better.lines > s.lines)
+              OR (better.score = s.score AND better.lines = s.lines AND better.best_clear > s.best_clear)
+              OR (
+                better.score = s.score
+                AND better.lines = s.lines
+                AND better.best_clear = s.best_clear
+                AND better.created_at < s.created_at
+              )
+              OR (
+                better.score = s.score
+                AND better.lines = s.lines
+                AND better.best_clear = s.best_clear
+                AND better.created_at = s.created_at
+                AND better.id < s.id
+              )
+            )
+        )
     `)
     .bind(...bindings)
     .first();

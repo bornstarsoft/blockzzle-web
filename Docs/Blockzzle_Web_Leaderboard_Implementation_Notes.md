@@ -138,7 +138,9 @@ Current MVP checks:
 - Maximum 50 accepted submissions per browser player id per day
 - Maximum 10 accepted submissions per nickname per day when browser player id is missing
 - Basic burst limit for repeated browser-player submissions
-- Public Today and All-Time leaderboard queries show the best score per browser player id per scope to reduce duplicate clutter
+- Public Today and All-Time leaderboard queries show the best score per normalized nickname per scope to reduce duplicate clutter
+- Nickname dedupe normalizes with `lower(trim(nickname))`
+- Tie-break order for the same nickname is score, lines, best clear, then earliest submission time
 - Public leaderboard queries always filter `rejected = 0`
 
 Limitations:

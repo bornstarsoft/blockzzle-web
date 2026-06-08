@@ -570,3 +570,85 @@ test("restart recovers from game over with a fresh tray", () => {
   assert.strictEqual(game.gameOver, false);
   assert.strictEqual(game.tray.filter(Boolean).length, 3);
 });
+
+async function testAsync(name, fn) {
+  try {
+    await fn();
+    console.log(`ok - ${name}`);
+  } catch (error) {
+    console.error(`not ok - ${name}`);
+    throw error;
+  }
+}
+
+(async () => {
+  const leaderboardShared = await import("../functions/api/leaderboard/_shared.js");
+
+  await testAsync("leaderboard public rows dedupe by normalized nickname and keep the best score", () => {
+    const rows = leaderboardShared.dedupeLeaderboardRowsByNickname([
+      {
+        nickname: "Player",
+        score: 1200,
+        lines: 10,
+        best_clear: 2,
+        tier: "Beginner",
+        created_at: "2026-06-08T01:00:00.000Z",
+      },
+      {
+        nickname: "player",
+        score: 1800,
+        lines: 14,
+        best_clear: 3,
+        tier: "Beginner",
+        created_at: "2026-06-08T02:00:00.000Z",
+      },
+      {
+        nickname: "Rival",
+        score: 1500,
+        lines: 12,
+        best_clear: 2,
+        tier: "Beginner",
+        created_at: "2026-06-08T03:00:00.000Z",
+      },
+    ]);
+
+    assert.deepStrictEqual(rows.map((row) => row.nickname), ["player", "Rival"]);
+    assert.deepStrictEqual(rows.map((row) => row.score), [1800, 1500]);
+  });
+
+  await testAsync("leaderboard public rows use a stable tie break for same nickname", () => {
+    const rows = leaderboardShared.dedupeLeaderboardRowsByNickname([
+      {
+        nickname: "Player",
+        score: 2000,
+        lines: 14,
+        best_clear: 2,
+        tier: "Beginner",
+        created_at: "2026-06-08T03:00:00.000Z",
+      },
+      {
+        nickname: "PLAYER",
+        score: 2000,
+        lines: 14,
+        best_clear: 2,
+        tier: "Beginner",
+        created_at: "2026-06-08T01:00:00.000Z",
+      },
+      {
+        nickname: "Player",
+        score: 2000,
+        lines: 16,
+        best_clear: 2,
+        tier: "Beginner",
+        created_at: "2026-06-08T02:00:00.000Z",
+      },
+    ]);
+
+    assert.strictEqual(rows.length, 1);
+    assert.strictEqual(rows[0].lines, 16);
+    assert.strictEqual(rows[0].created_at, "2026-06-08T02:00:00.000Z");
+  });
+})().catch((error) => {
+  process.exitCode = 1;
+  throw error;
+});

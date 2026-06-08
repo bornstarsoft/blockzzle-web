@@ -35,6 +35,47 @@ function toInteger(value) {
   return null;
 }
 
+export function normalizeLeaderboardNicknameKey(value) {
+  return String(value || "").trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+function compareLeaderboardRows(left, right) {
+  const scoreDelta = Number(right.score || 0) - Number(left.score || 0);
+  if (scoreDelta) return scoreDelta;
+
+  const linesDelta = Number(right.lines || 0) - Number(left.lines || 0);
+  if (linesDelta) return linesDelta;
+
+  const clearDelta = Number(right.best_clear || 0) - Number(left.best_clear || 0);
+  if (clearDelta) return clearDelta;
+
+  const leftCreatedAt = String(left.created_at || "");
+  const rightCreatedAt = String(right.created_at || "");
+  if (leftCreatedAt !== rightCreatedAt) return leftCreatedAt < rightCreatedAt ? -1 : 1;
+
+  const leftId = String(left.id || "");
+  const rightId = String(right.id || "");
+  if (leftId !== rightId) return leftId < rightId ? -1 : 1;
+
+  return 0;
+}
+
+export function dedupeLeaderboardRowsByNickname(rows, limit = MAX_RETURNED_ENTRIES) {
+  const bestByNickname = new Map();
+  (Array.isArray(rows) ? rows : []).forEach((row) => {
+    const key = normalizeLeaderboardNicknameKey(row && row.nickname);
+    if (!key) return;
+    const current = bestByNickname.get(key);
+    if (!current || compareLeaderboardRows(row, current) < 0) {
+      bestByNickname.set(key, row);
+    }
+  });
+
+  return Array.from(bestByNickname.values())
+    .sort(compareLeaderboardRows)
+    .slice(0, limit);
+}
+
 export function validateNickname(value) {
   const nickname = String(value || "").trim().replace(/\s+/g, " ");
   if (nickname.length < 2 || nickname.length > 16) {

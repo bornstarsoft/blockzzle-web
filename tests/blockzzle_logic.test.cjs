@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v024.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v025.js");
 
 function piece(cells, id = "test", color = 0) {
   return { id, cells, color };
@@ -293,6 +293,44 @@ test("leaderboard game-over layout centers submit and keeps play again inside pa
   assert.strictEqual(layout.playAgainButton.x, 195);
   assert.ok(layout.playAgainButton.bottom <= layout.panelBottom - 12);
   assert.ok(layout.tabButtons.y > layout.submitButton.y);
+});
+
+test("ranks control sits under restart without overlapping the board", () => {
+  const layout = BlockzzleCore.getLeaderboardButtonLayout({
+    width: 390,
+    margin: 20,
+    restartButton: { x: 303, y: 10, width: 67, height: 32 },
+    buttonWidth: 52,
+    buttonHeight: 26,
+    boardTop: 154,
+  });
+
+  assert.ok(layout.x >= 303);
+  assert.ok(layout.y > 10 + 32);
+  assert.ok(layout.bottom < 154);
+});
+
+test("leaderboard submit CTA is primary only for a new today best", () => {
+  const newBest = BlockzzleCore.getLeaderboardSubmitCta({
+    score: 1200,
+    previousTodayBest: 900,
+    submitted: false,
+    submitting: false,
+  });
+  const normal = BlockzzleCore.getLeaderboardSubmitCta({
+    score: 500,
+    previousTodayBest: 900,
+    submitted: false,
+    submitting: false,
+  });
+
+  assert.strictEqual(newBest.message, "New Today Best!");
+  assert.strictEqual(newBest.buttonLabel, "Submit Score");
+  assert.strictEqual(newBest.primary, true);
+  assert.strictEqual(normal.message, "Score saved locally.");
+  assert.strictEqual(normal.buttonLabel, "Submit anyway");
+  assert.strictEqual(normal.primary, false);
+  assert.strictEqual(BlockzzleCore.getLeaderboardSubmitCta({ submitted: true }).buttonLabel, "Submitted");
 });
 
 test("sound cue definitions stay subtle and asset-free", () => {

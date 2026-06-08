@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v025.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v026.js");
 
 function piece(cells, id = "test", color = 0) {
   return { id, cells, color };
@@ -250,7 +250,7 @@ test("leaderboard submission validation rejects impossible MVP values", () => {
     best_clear: 4,
     tier: "Beginner",
     duration_seconds: 120,
-    client_version: "v023",
+    client_version: "v026",
     browser_player_id: "bz_1234567890abcdef",
   });
 
@@ -260,8 +260,28 @@ test("leaderboard submission validation rejects impossible MVP values", () => {
   assert.strictEqual(valid.entry.best_clear, 4);
   assert.strictEqual(BlockzzleCore.validateLeaderboardSubmission({ ...valid.entry, score: 1000001 }).ok, false);
   assert.strictEqual(BlockzzleCore.validateLeaderboardSubmission({ ...valid.entry, duration_seconds: 4 }).ok, false);
-  assert.strictEqual(BlockzzleCore.validateLeaderboardSubmission({ ...valid.entry, duration_seconds: 8, score: 6000 }).ok, false);
+  assert.strictEqual(BlockzzleCore.validateLeaderboardSubmission({ ...valid.entry, score: 0, duration_seconds: 0 }).ok, true);
+  assert.strictEqual(BlockzzleCore.validateLeaderboardSubmission({ ...valid.entry, duration_seconds: 8, score: 4000 }).ok, false);
+  assert.strictEqual(BlockzzleCore.validateLeaderboardSubmission({ ...valid.entry, duration_seconds: 20, score: 16000 }).ok, false);
   assert.strictEqual(BlockzzleCore.validateLeaderboardSubmission({ ...valid.entry, best_clear: 17 }).ok, false);
+  assert.strictEqual(BlockzzleCore.validateLeaderboardSubmission({ ...valid.entry, tier: "Legend" }).ok, false);
+  assert.strictEqual(BlockzzleCore.validateLeaderboardSubmission({ ...valid.entry, client_version: "v012345678901234567890" }).ok, false);
+  assert.strictEqual(BlockzzleCore.validateLeaderboardSubmission({ ...valid.entry, browser_player_id: "x".repeat(81) }).ok, false);
+});
+
+test("leaderboard submit failure copy stays friendly for players", () => {
+  assert.strictEqual(
+    BlockzzleCore.getLeaderboardSubmitErrorMessage("rate_limited"),
+    "Leaderboard submission was limited. Try again later."
+  );
+  assert.strictEqual(
+    BlockzzleCore.getLeaderboardSubmitErrorMessage("invalid_submission"),
+    "Score could not be submitted."
+  );
+  assert.strictEqual(
+    BlockzzleCore.getLeaderboardSubmitErrorMessage("leaderboard_unavailable"),
+    "Leaderboard is coming soon."
+  );
 });
 
 test("browser player id generation stores one anonymous local id", () => {

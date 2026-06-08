@@ -1,7 +1,9 @@
 const MAX_SCORE = 1000000;
 const MAX_RETURNED_ENTRIES = 100;
 const ALLOWED_TIERS = new Set(["Rookie", "Beginner", "Skilled", "Expert", "Master", "World Class"]);
-const BLOCKED_NICKNAMES = new Set(["admin", "moderator", "support", "badword"]);
+const BLOCKED_NICKNAMES = new Set(["admin", "moderator", "support", "staff", "owner", "badword"]);
+const MAX_CLIENT_VERSION_LENGTH = 20;
+const MAX_BROWSER_PLAYER_ID_LENGTH = 80;
 
 export function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -59,8 +61,8 @@ export function validateSubmission(input) {
     ? null
     : toInteger(body.duration_seconds);
   const tier = String(body.tier || "").trim();
-  const clientVersion = String(body.client_version || "").trim().slice(0, 24);
-  const browserPlayerId = String(body.browser_player_id || "").trim().slice(0, 80);
+  const clientVersion = String(body.client_version || "").trim();
+  const browserPlayerId = String(body.browser_player_id || "").trim();
 
   if (score === null || score < 0 || score > MAX_SCORE) {
     return { ok: false, error: "Score is outside the MVP leaderboard range." };
@@ -74,11 +76,23 @@ export function validateSubmission(input) {
   if (!ALLOWED_TIERS.has(tier)) {
     return { ok: false, error: "Score tier is not supported." };
   }
-  if (durationSeconds !== null && durationSeconds < 5) {
+  if (durationSeconds !== null && durationSeconds < 0) {
+    return { ok: false, error: "Run duration is outside the MVP leaderboard range." };
+  }
+  if (durationSeconds !== null && score > 0 && durationSeconds < 5) {
     return { ok: false, error: "Run duration is too short for leaderboard submission." };
   }
-  if (durationSeconds !== null && durationSeconds < 10 && score > 5000) {
+  if (durationSeconds !== null && durationSeconds < 10 && score > 3000) {
     return { ok: false, error: "Score is too high for the submitted duration." };
+  }
+  if (durationSeconds !== null && durationSeconds < 30 && score > 15000) {
+    return { ok: false, error: "Score is too high for the submitted duration." };
+  }
+  if (clientVersion.length > MAX_CLIENT_VERSION_LENGTH) {
+    return { ok: false, error: "Client version is outside the MVP leaderboard range." };
+  }
+  if (browserPlayerId.length > MAX_BROWSER_PLAYER_ID_LENGTH) {
+    return { ok: false, error: "Browser player id is outside the MVP leaderboard range." };
   }
 
   return {

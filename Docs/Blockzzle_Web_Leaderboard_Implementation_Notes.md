@@ -124,14 +124,22 @@ Current MVP checks:
 
 - Nickname must be 2-16 characters after trim
 - Nickname may use letters, numbers, spaces, underscore, and hyphen
-- Tiny reserved-name blocklist: `admin`, `moderator`, `support`, `badword`
+- Tiny reserved-name blocklist: `admin`, `moderator`, `support`, `staff`, `owner`, `badword`
 - Score must be an integer from 0 to 1,000,000
 - Lines must be an integer from 0 to 10,000
 - Best clear must be an integer from 0 to 16
 - Tier must match a known local score tier
-- Duration must be at least 5 seconds if provided
-- Reject score above 5,000 when duration is below 10 seconds
-- Basic per-browser-player-id submission rate limit
+- Duration must be an integer if provided
+- Duration must be at least 5 seconds for non-zero scores
+- Reject score above 3,000 when duration is below 10 seconds
+- Reject score above 15,000 when duration is below 30 seconds
+- Client version must be 20 characters or fewer
+- Browser player id must be 80 characters or fewer
+- Maximum 50 accepted submissions per browser player id per day
+- Maximum 10 accepted submissions per nickname per day when browser player id is missing
+- Basic burst limit for repeated browser-player submissions
+- Public Today and All-Time leaderboard queries show the best score per browser player id per scope to reduce duplicate clutter
+- Public leaderboard queries always filter `rejected = 0`
 
 Limitations:
 
@@ -139,7 +147,8 @@ Limitations:
 - The browser player id is not identity proof.
 - Nickname moderation is minimal.
 - Top scores may require manual review.
-- Future production hardening should add stronger validation, abuse review tools, and moderation workflow before treating scores as trusted.
+- The MVP limits reduce obvious spam and impossible submissions, but they are not production-grade anti-cheat.
+- Future production hardening should add Daily Challenge seed verification, move-log or score-event validation, stronger abuse review tools, an admin delete/moderation flow, and rate limiting tied to Cloudflare platform signals.
 
 ## Privacy
 

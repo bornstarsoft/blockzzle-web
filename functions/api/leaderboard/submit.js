@@ -1,5 +1,9 @@
 import { createId, getDayKey, json, publicEntry, unavailableJson, validateSubmission } from "./_shared.js";
 
+const MAX_BROWSER_DAILY_SUBMISSIONS = 50;
+const MAX_NICKNAME_DAILY_SUBMISSIONS = 10;
+const MAX_BROWSER_MINUTE_SUBMISSIONS = 6;
+
 async function readJson(request) {
   try {
     return await request.json();
@@ -8,26 +12,92 @@ async function readJson(request) {
   }
 }
 
-async function enforceBasicRateLimit(db, browserPlayerId, now) {
-  if (!browserPlayerId) return { ok: true };
-  const since = new Date(now.getTime() - 60 * 1000).toISOString();
-  const result = await db
-    .prepare(`
+async function countAccepted(db, sql, bindings) {
+  const result = await db.prepare(sql).bind(...bindings).first();
+  return Number(result && result.count ? result.count : 0);
+}
+
+async function enforceSubmissionLimits(db, entry, dayKey, now) {
+  if (!entry.browser_player_id) {
+    const nicknameCount = await countAccepted(db, `
       SELECT COUNT(*) AS count
       FROM blockzzle_scores
-      WHERE browser_player_id = ?
-        AND created_at >= ?
-    `)
-    .bind(browserPlayerId, since)
-    .first();
-  const count = Number(result && result.count ? result.count : 0);
-  if (count >= 6) {
-    return { ok: false, error: "Too many submissions. Please wait a moment." };
+      WHERE rejected = 0
+        AND day_key = ?
+        AND LOWER(nickname) = LOWER(?)
+    `, [dayKey, entry.nickname]);
+
+    if (nicknameCount >= MAX_NICKNAME_DAILY_SUBMISSIONS) {
+      return { ok: false };
+    }
+    return { ok: true };
   }
+
+  const dailyCount = await countAccepted(db, `
+    SELECT COUNT(*) AS count
+    FROM blockzzle_scores
+    WHERE rejected = 0
+      AND day_key = ?
+      AND browser_player_id = ?
+  `, [dayKey, entry.browser_player_id]);
+
+  if (dailyCount >= MAX_BROWSER_DAILY_SUBMISSIONS) {
+    return { ok: false };
+  }
+
+  const since = new Date(now.getTime() - 60 * 1000).toISOString();
+  const burstCount = await countAccepted(db, `
+    SELECT COUNT(*) AS count
+    FROM blockzzle_scores
+    WHERE rejected = 0
+      AND browser_player_id = ?
+      AND created_at >= ?
+  `, [entry.browser_player_id, since]);
+
+  if (burstCount >= MAX_BROWSER_MINUTE_SUBMISSIONS) {
+    return { ok: false };
+  }
+
   return { ok: true };
 }
 
+async function getScopedRank(db, score, dayKey) {
+  const scopedWhere = dayKey ? "AND day_key = ?" : "";
+  const bindings = dayKey ? [dayKey, score] : [score];
+  const result = await db
+    .prepare(`
+      WITH best_scores AS (
+        SELECT
+          score,
+          ROW_NUMBER() OVER (
+            PARTITION BY COALESCE(NULLIF(browser_player_id, ''), 'nickname:' || LOWER(nickname))
+            ORDER BY score DESC, created_at ASC
+          ) AS player_row
+        FROM blockzzle_scores
+        WHERE rejected = 0
+          ${scopedWhere}
+      )
+      SELECT COUNT(*) + 1 AS rank
+      FROM best_scores
+      WHERE player_row = 1
+        AND score > ?
+    `)
+    .bind(...bindings)
+    .first();
+
+  return Number(result && result.rank ? result.rank : 1);
+}
+
 async function getRank(db, score, dayKey) {
+  const todayRank = await getScopedRank(db, score, dayKey);
+  const allTimeRank = await getScopedRank(db, score, "");
+  return {
+    today_rank: todayRank,
+    alltime_rank: allTimeRank,
+  };
+}
+
+async function getLegacyRank(db, score, dayKey) {
   const todayResult = await db
     .prepare(`
       SELECT COUNT(*) + 1 AS rank
@@ -72,9 +142,13 @@ export async function onRequestPost({ request, env }) {
   const entry = validation.entry;
 
   try {
-    const rateLimit = await enforceBasicRateLimit(env.DB, entry.browser_player_id, now);
+    const rateLimit = await enforceSubmissionLimits(env.DB, entry, dayKey, now);
     if (!rateLimit.ok) {
-      return json({ ok: false, error: "rate_limited", message: rateLimit.error }, 429);
+      return json({
+        ok: false,
+        error: "rate_limited",
+        message: "Leaderboard submission was limited. Try again later.",
+      }, 429);
     }
 
     const id = createId();
@@ -113,7 +187,12 @@ export async function onRequestPost({ request, env }) {
       )
       .run();
 
-    const ranks = await getRank(env.DB, entry.score, dayKey);
+    let ranks;
+    try {
+      ranks = await getRank(env.DB, entry.score, dayKey);
+    } catch (error) {
+      ranks = await getLegacyRank(env.DB, entry.score, dayKey);
+    }
     const publicRow = publicEntry({
       nickname: entry.nickname,
       score: entry.score,

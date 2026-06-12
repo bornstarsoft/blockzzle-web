@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v028.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v029.js");
 
 function piece(cells, id = "test", color = 0) {
   return { id, cells, color };
@@ -131,9 +131,16 @@ test("home embed mode compacts duplicate play header space", () => {
   assert.strictEqual(embedded.showHowTo, false);
   assert.strictEqual(embedded.showHomeLink, false);
   assert.strictEqual(embedded.showLeaderboardButton, false);
+  assert.strictEqual(embedded.showNextGoalText, false);
+  assert.strictEqual(standalone.showNextGoalText, true);
   assert.strictEqual(standalone.showLeaderboardButton, true);
   assert.ok(embedded.headerBottom < standalone.headerBottom);
   assert.ok(embedded.chipY < standalone.chipY);
+  assert.ok(embedded.chipY >= 60);
+  assert.ok(
+    embedded.metricChipWidths.reduce((total, width) => total + width, 0) + embedded.metricChipGap * 3 <
+    standalone.metricChipWidths.reduce((total, width) => total + width, 0)
+  );
 });
 
 test("portrait prompt only appears for cramped mobile landscape viewports", () => {
@@ -266,7 +273,7 @@ test("leaderboard submission validation rejects impossible MVP values", () => {
     best_clear: 4,
     tier: "Beginner",
     duration_seconds: 120,
-    client_version: "v028",
+    client_version: "v029",
     browser_player_id: "bz_1234567890abcdef",
   });
 

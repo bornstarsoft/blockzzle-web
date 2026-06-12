@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v027.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v028.js");
 
 function piece(cells, id = "test", color = 0) {
   return { id, cells, color };
@@ -130,6 +130,8 @@ test("home embed mode compacts duplicate play header space", () => {
   assert.strictEqual(embedded.showSubtitle, false);
   assert.strictEqual(embedded.showHowTo, false);
   assert.strictEqual(embedded.showHomeLink, false);
+  assert.strictEqual(embedded.showLeaderboardButton, false);
+  assert.strictEqual(standalone.showLeaderboardButton, true);
   assert.ok(embedded.headerBottom < standalone.headerBottom);
   assert.ok(embedded.chipY < standalone.chipY);
 });
@@ -264,7 +266,7 @@ test("leaderboard submission validation rejects impossible MVP values", () => {
     best_clear: 4,
     tier: "Beginner",
     duration_seconds: 120,
-    client_version: "v027",
+    client_version: "v028",
     browser_player_id: "bz_1234567890abcdef",
   });
 

@@ -1,0 +1,10 @@
+# Public mobile app URLs for the homepage app card.
+# Leave a URL empty until that store listing is publicly available.
+# The homepage renders empty store URLs as "Coming soon" instead of fake links.
+
+android_app_url = ""
+ios_app_url = ""
+
+# QR/mobile-link target. Until public app URLs are known, this points to the
+# browser game so mobile visitors can play immediately without installing.
+qr_target_url = "https://blockzzle.com/play/"

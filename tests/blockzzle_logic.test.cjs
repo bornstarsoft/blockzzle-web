@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v026.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v027.js");
 
 function piece(cells, id = "test", color = 0) {
   return { id, cells, color };
@@ -118,6 +118,20 @@ test("mobile touch edge inset keeps board away from iPhone screen edges", () => 
 
 test("orientation changes use delayed multi-pass relayout on mobile browsers", () => {
   assert.deepStrictEqual(BlockzzleCore.getOrientationRelayoutDelays(), [0, 100, 300, 600]);
+});
+
+test("home embed mode compacts duplicate play header space", () => {
+  const standalone = BlockzzleCore.getPlayLayoutProfile({ width: 390, height: 744, embedHome: false });
+  const embedded = BlockzzleCore.getPlayLayoutProfile({ width: 390, height: 744, embedHome: true });
+
+  assert.strictEqual(BlockzzleCore.isHomeEmbedMode("?embed=home"), true);
+  assert.strictEqual(BlockzzleCore.isHomeEmbedMode("?embed=standalone"), false);
+  assert.strictEqual(embedded.showTitle, false);
+  assert.strictEqual(embedded.showSubtitle, false);
+  assert.strictEqual(embedded.showHowTo, false);
+  assert.strictEqual(embedded.showHomeLink, false);
+  assert.ok(embedded.headerBottom < standalone.headerBottom);
+  assert.ok(embedded.chipY < standalone.chipY);
 });
 
 test("portrait prompt only appears for cramped mobile landscape viewports", () => {
@@ -250,7 +264,7 @@ test("leaderboard submission validation rejects impossible MVP values", () => {
     best_clear: 4,
     tier: "Beginner",
     duration_seconds: 120,
-    client_version: "v026",
+    client_version: "v027",
     browser_player_id: "bz_1234567890abcdef",
   });
 

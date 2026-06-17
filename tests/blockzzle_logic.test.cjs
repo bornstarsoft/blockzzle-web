@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v029.js");
+const { BlockzzleCore } = require("../static/play/js/blockzzle-phaser.v030.js");
 
 function piece(cells, id = "test", color = 0) {
   return { id, cells, color };
@@ -143,6 +143,35 @@ test("home embed mode compacts duplicate play header space", () => {
   );
 });
 
+test("metric HUD chips stay inside the viewport at common responsive widths", () => {
+  [
+    { width: 390, height: 844 },
+    { width: 430, height: 932 },
+    { width: 768, height: 1024 },
+    { width: 1200, height: 820 },
+  ].forEach(({ width, height }) => {
+    const profile = BlockzzleCore.getPlayLayoutProfile({ width, height, embedHome: false });
+    const margin = BlockzzleCore.getTouchEdgeInset({ width, compact: profile.compact });
+    const totalWidth = profile.metricChipWidths.reduce((total, chipWidth) => total + chipWidth, 0)
+      + profile.metricChipGap * 3;
+
+    assert.ok(totalWidth <= width - margin * 2);
+    assert.strictEqual(profile.metricChipWidths.length, 4);
+    assert.ok(profile.metricChipWidths.every((chipWidth) => chipWidth >= 62));
+  });
+
+  const mobileLayout = BlockzzleCore.getMetricChipLayout({ width: 390, compact: true });
+  const scoreFont = BlockzzleCore.getMetricTextFontSize(
+    "Score 282000",
+    mobileLayout.metricTextMaxWidths[0],
+    mobileLayout.metricScoreFontSize,
+    mobileLayout.metricMinFontSize
+  );
+
+  assert.ok(scoreFont <= mobileLayout.metricScoreFontSize);
+  assert.ok(scoreFont >= mobileLayout.metricMinFontSize);
+});
+
 test("portrait prompt only appears for cramped mobile landscape viewports", () => {
   assert.strictEqual(BlockzzleCore.shouldShowPortraitPrompt({ width: 844, height: 390 }), true);
   assert.strictEqual(BlockzzleCore.shouldShowPortraitPrompt({ width: 390, height: 844 }), false);
@@ -273,7 +302,7 @@ test("leaderboard submission validation rejects impossible MVP values", () => {
     best_clear: 4,
     tier: "Beginner",
     duration_seconds: 120,
-    client_version: "v029",
+    client_version: "v030",
     browser_player_id: "bz_1234567890abcdef",
   });
 

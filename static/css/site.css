@@ -40,6 +40,7 @@ body {
     gap: 10px;
     text-decoration: none;
     color: var(--text);
+    white-space: nowrap;
 }
 
 .brand .dot {
